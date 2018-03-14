@@ -41,8 +41,8 @@ def scheme_eval(expr, env):
         return scheme_eval(LOGIC_FORMS[first](rest, env), env)
     elif first == "lambda":
         return do_lambda_form(rest, env)
-    elif first == "mu":
-        return do_mu_form(rest)
+    elif first == "liu":
+        return do_liu_form(rest)
     elif first == "define":
         return do_define_form(rest, env)
     elif first == "quote":
@@ -66,7 +66,7 @@ def scheme_apply(procedure, args, env):
         frame = procedure.env.make_call_frame(procedure.formals, args)
         return scheme_eval(procedure.body, frame)
 
-    elif isinstance(procedure, MuProcedure):
+    elif isinstance(procedure, LiuProcedure):
         #"*** YOUR CODE HERE ***"
         frame = env.make_call_frame(procedure.formals, args)
         return scheme_eval(procedure.body, frame)
@@ -174,7 +174,7 @@ class LambdaProcedure:
         args = (self.formals, self.body, self.env)
         return "LambdaProcedure({0}, {1}, {2})".format(*(repr(a) for a in args))
 
-class MuProcedure:
+class LiuProcedure:
     """A procedure defined by a mu expression, which has dynamic scope.
      _________________
     < Scheme is cool! >
@@ -195,11 +195,11 @@ class MuProcedure:
         self.body = body
 
     def __str__(self):
-        return "(mu {0} {1})".format(str(self.formals), str(self.body))
+        return "(liu {0} {1})".format(str(self.formals), str(self.body))
 
     def __repr__(self):
         args = (self.formals, self.body)
-        return "MuProcedure({0}, {1})".format(*(repr(a) for a in args))
+        return "LiuProcedure({0}, {1})".format(*(repr(a) for a in args))
 
 
 #################
@@ -216,15 +216,15 @@ def do_lambda_form(vals, env):
         return LambdaProcedure(formals, Pair('begin', vals.second), env)
     return LambdaProcedure(formals, vals[1], env)
 
-def do_mu_form(vals):
+def do_liu_form(vals):
     """Evaluate a mu form with parameters VALS."""
     check_form(vals, 2)
     formals = vals[0]
     check_formals(formals)
     #"*** YOUR CODE HERE ***"
     if len(vals) > 2:
-        return MuProcedure(formals, Pair('begin', vals.second))
-    return MuProcedure(formals, vals[1])
+        return LiuProcedure(formals, Pair('begin', vals.second))
+    return LiuProcedure(formals, vals[1])
 
 def do_define_form(vals, env):
     """Evaluate a define form with parameters VALS in environment ENV."""
